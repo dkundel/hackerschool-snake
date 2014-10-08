@@ -1,2 +1,2 @@
-hackerschool-snacke
+hackerschool-snake
 ===================
