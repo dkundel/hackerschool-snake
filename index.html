@@ -5,14 +5,16 @@
   <link href="//fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet" type="text/css">
   <style>
     html {
+      /* eine coole Schrift benutzen */
       background: black;
       color: limegreen;
       font-family: 'Press Start 2P', cursive;
     }
 
+    /* Ränder anpassen */
     html, body {
       width: 100%;
-      text-align: center
+      text-align: center;
     }
 
     body {
@@ -20,11 +22,17 @@
     }
 
     h1,h2,h3,h4,h5,h6,h7 {
+      /* Alle Überschriften auf Normalgröße stellen */
       font-weight: normal;
     }
+
+
     .hidden {
+      /* Zum verstcken von Elementen */
       display: none;
     }
+
+    /* Die Knöpfe schön aussehen lassen */
     button {
       border: 4px limegreen solid;
       padding: 10px;
@@ -53,11 +61,18 @@
 <script>
 </script>
 <script>
-  var canvas = document.getElementById('canvas');
+  //variablen deklaration
+  var canvas = document.getElementById('canvas'); //den canvas nutzen
   var ctx = canvas.getContext('2d');
+
+  //breite und höhe
   var w = canvas.width;
   var h = canvas.height;
+
+  //größe einer zelle
   var cw = 10;
+
+  //noch mehr variablen
   var d;
   var food;
   var score;
@@ -65,24 +80,34 @@
   var game_loop;
 
   function hideSection (id) {
+    //versteckt ein element
   	document.getElementById(id).className += 'hidden';
   }
 
   function showSection (id) {
+    //zeigt ein element
    	document.getElementById(id).className = document.getElementById(id).className.replace(/\s?hidden\s?/g, '');
   }
 
   function onStartGame (evt) {
+    //wird aufgerufen wenn das spiel gestartet wird
     hideSection('preGameDialog');
     showSection('gameDialog');
     init();
   }
 
   function init () {
+    //richtung zurücksetzen
     d = 'right';
+
+    //schlange und essen initialisieren
     createSnake();
     createFood();
+
+    //punkte zurücksetzen
     score = 0;
+
+    //spiel schleife starten
     if (typeof game_loop !== 'undefined') {
       clearInterval(game_loop);
     }
@@ -90,33 +115,43 @@
   }
 
   function endGame () {
+
+    //spiel schleife stoppen
     if (typeof game_loop !== 'undefined') {
       clearInterval(game_loop);
     }
-	showSection('gameOver');
+
+    //und die elemente wieder richtig setzen
+  	showSection('gameOver');
     showSection('preGameDialog');
   }
 
   function createSnake () {
+    //die schlange bauen
+
     var length = 5;
     snake_array = [];
-    opponent_snake = [];
     for (var i = length-1; i >= 0; i--) {
       snake_array.push({x: i, y: 0});
     }
   }
 
   function createFood () {
+    //zufällig essen auf dem spielfeld erstellen.
     food = {
       x: Math.round(Math.random()*(w-cw)/cw),
       y: Math.round(Math.random()*(h-cw)/cw)
     }
+
   }
 
   function loop () {
+
+    //die spiel schleife
   	var nx = snake_array[0].x;
     var ny = snake_array[0].y;
 
+    //die schlange in die richtige richtung bewegen
     if (d === 'right') {
       nx++;
     } else if (d === 'left') {
@@ -127,43 +162,53 @@
       ny++;
     }
 
+    //wenn wir am Rand sind, oder mit der Schlange kollidieren, ist das Spiel zu ende
     if (nx === -1 || nx === w/cw || ny === -1 || ny === h/cw || checkCollision(nx, ny, snake_array)) {
-	  endGame();
+  	  endGame();
       return;
     }
 
     if (nx === food.x && ny === food.y) {
+      //wir haben essen getriffen => schlange verlängern
       var tail = {x: nx, y: ny};
       score++;
       createFood();
     } else {
+      //wir haben kein Essen getroffen => das letzte element der schlange netfernen
       var tail = snake_array.pop();
       tail.x = nx;
       tail.y = ny;
     }
 
+    //und das letzte element der schlange entfernen
     snake_array.unshift(tail);
 
+    //neu zeichnen
     paint();
   }
 
   function paint () {
+    //die box mit hintergrund und rahmen zeichnen
     ctx.fillStyle = '#333333';
     ctx.fillRect(0, 0, w, h);
     ctx.strokeStyle = 'limegreen';
     ctx.strokeRect(0, 0, w, h);
 
+    //die schlangen positionen in grün zeichnen
     for (var i = 0; i < snake_array.length; i++) {
       var c = snake_array[i];
       paintCell(c.x, c.y, 'limegreen');
     }
 
+    //das essen rot makieren
     paintCell(food.x, food.y, 'red');
 
+    //und die Punkte aktualisieren
   	document.getElementById('yourScore').innerHTML = score;
   }
 
   function paintCell (x,y, color) {
+    //eine Zelle einfärben
     ctx.fillStyle = color;
     ctx.fillRect(x*cw, y*cw, cw, cw);
     ctx.strokeStyle = '#333333';
@@ -171,15 +216,19 @@
   }
 
   function checkCollision (x, y, array) {
+    //überprüfen ob ein array mit einer bestimmten koordinate kollidiert
+
     for (var i = 0; i < array.length; i++) {
       if (array[i].x === x && array[i].y === y) {
         return true;
       }
     }
+
     return false;
   }
 
   function handleKeyPress (evt) {
+    //bei druck auf die richtige taste die richtige richtung setzen
     var key = evt.which;
     if (key == '37' && d != 'right') d = 'left';
     else if (key == '38' && d != 'down') d = 'up';
@@ -187,6 +236,8 @@
     else if (key == '40' && d != 'up') d = 'down';
   }
 
+
+  //auf knopf und tastendruck die richtigen Sachen machen
   document.getElementById('startGameButton').addEventListener('click', onStartGame, false);
   window.addEventListener('keydown', handleKeyPress, false);
 
